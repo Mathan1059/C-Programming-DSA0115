@@ -1,0 +1,69 @@
+
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+class Staff {
+protected:
+    string name;
+    int id;
+    double basic;
+    static constexpr double DA = 0.42;
+
+public:
+    Staff(string n, int i, double b)
+        : name(n), id(i), basic(b) {}
+
+    virtual double pay() const = 0;
+    virtual ~Staff() {}
+};
+
+class Professor : public Staff {
+    double research;
+
+public:
+    Professor(string n, int i, double b, double r)
+        : Staff(n, i, b), research(r) {}
+
+    double pay() const override {
+        return basic + basic * DA + research;
+    }
+};
+
+class LabAssistant : public Staff {
+public:
+    LabAssistant(string n, int i, double b)
+        : Staff(n, i, b) {}
+
+    double pay() const override {
+        return basic + basic * DA;
+    }
+};
+
+class GuestFaculty : public Staff {
+    double hours, rate;
+
+public:
+    GuestFaculty(string n, int i, double h, double r)
+        : Staff(n, i, 0), hours(h), rate(r) {}
+
+    double pay() const override {
+        return hours * rate;
+    }
+};
+
+int main() {
+    vector<Staff*> s;
+
+    s.push_back(new Professor("Ravi", 101, 50000, 5000));
+    s.push_back(new LabAssistant("Kumar", 102, 30000));
+    s.push_back(new GuestFaculty("Anu", 103, 20, 500));
+
+    for (auto x : s) {
+        cout << x->pay() << endl;
+        delete x;
+    }
+
+    return 0;
+}
