@@ -1,0 +1,68 @@
+
+#include <iostream>
+using namespace std;
+
+class Event {
+    int rows, seats;
+    char** map;
+
+public:
+    Event(int r, int s) : rows(r), seats(s), map(nullptr) {
+        if (r <= 0 || s <= 0) {
+            rows = seats = 0;
+            return;
+        }
+
+        map = new char*[rows];
+
+        for (int i = 0; i < rows; i++) {
+            map[i] = new char[seats];
+
+            for (int j = 0; j < seats; j++)
+                map[i][j] = '.';
+        }
+
+        cout << "Event created" << endl;
+    }
+
+    void book(int r, int s) {
+        if (r >= 0 && r < rows && s >= 0 && s < seats)
+            map[r][s] = 'B';
+    }
+
+    void cancel(int r, int s) {
+        if (r >= 0 && r < rows && s >= 0 && s < seats)
+            map[r][s] = '.';
+    }
+
+    void display() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < seats; j++)
+                cout << map[i][j] << " ";
+            cout << endl;
+        }
+    }
+
+    ~Event() {
+        for (int i = 0; i < rows; i++)
+            delete[] map[i];
+
+        delete[] map;
+        cout << "Event destroyed" << endl;
+    }
+};
+
+int main() {
+    Event e(2, 3);
+
+    e.book(0, 1);
+    e.book(1, 2);
+    e.display();
+
+    e.cancel(0, 1);
+
+    Event* p = new Event(2, 2);
+    delete p;
+
+    return 0;
+}
