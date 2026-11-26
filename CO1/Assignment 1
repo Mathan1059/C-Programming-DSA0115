@@ -1,0 +1,53 @@
+
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+enum class Zone { Inner, Middle, Outer };
+
+const long long BASE[] = {1000, 2000, 3000};
+const int PEAK = 20;
+const long long MIN_BALANCE = 5000;
+
+long long fare(Zone z, bool peak) {
+    long long f = BASE[static_cast<int>(z)];
+
+    if (peak)
+        f += f * PEAK / 100;
+
+    return f;
+}
+
+bool canTravel(long long balance, long long f) {
+    return balance - f >= MIN_BALANCE;
+}
+
+int main() {
+    long long balance = 10000;
+    int z, h, m;
+
+    cout << "Enter zone, hour and minute: ";
+    cin >> z >> h >> m;
+
+    if (z < 0 || z > 2 || h < 0 || h > 23 || m < 0 || m > 59) {
+        cout << "Invalid Input";
+        return 0;
+    }
+
+    int t = h * 60 + m;
+    bool peak = (t >= 480 && t < 600) ||
+                (t >= 1020 && t < 1200);
+
+    long long f = fare(static_cast<Zone>(z), peak);
+
+    if (canTravel(balance, f)) {
+        balance -= f;
+        cout << fixed << setprecision(2);
+        cout << "Fare Rs " << f / 100.0 << endl;
+        cout << "Balance Rs " << balance / 100.0;
+    } else {
+        cout << "Denied (low balance)";
+    }
+
+    return 0;
+}
