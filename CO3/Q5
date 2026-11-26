@@ -1,0 +1,86 @@
+
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Time {
+public:
+    int h, m, s;
+
+    Time(int a = 0, int b = 0, int c = 0)
+        : h(a), m(b), s(c) {}
+
+    Time& operator++() {
+        if (++s == 60) {
+            s = 0;
+            if (++m == 60) {
+                m = 0;
+                ++h;
+            }
+        }
+        return *this;
+    }
+
+    Time operator++(int) {
+        Time old = *this;
+        ++(*this);
+        return old;
+    }
+
+    bool operator==(const Time& t) const {
+        return h == t.h && m == t.m && s == t.s;
+    }
+
+    bool operator<(const Time& t) const {
+        if (h != t.h) return h < t.h;
+        if (m != t.m) return m < t.m;
+        return s < t.s;
+    }
+};
+
+class Playlist {
+    vector<string> tracks;
+
+public:
+    Playlist() {
+        tracks = {"Song1", "Song2", "Song3"};
+    }
+
+    string& operator[](int i) {
+        static string empty = "";
+
+        if (i < 0 || i >= tracks.size()) {
+            cout << "Index out of range" << endl;
+            return empty;
+        }
+
+        return tracks[i];
+    }
+
+    const string& operator[](int i) const {
+        static string empty = "";
+
+        if (i < 0 || i >= tracks.size())
+            return empty;
+
+        return tracks[i];
+    }
+};
+
+int main() {
+    Time t(0, 59, 58);
+
+    Time a = t++;
+    Time b = ++t;
+
+    cout << a.h << ":" << a.m << ":" << a.s << endl;
+    cout << b.h << ":" << b.m << ":" << b.s << endl;
+
+    Playlist p;
+
+    cout << p[0] << endl;
+    cout << p[1] << endl;
+
+    return 0;
+}
