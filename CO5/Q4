@@ -1,0 +1,102 @@
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <stdexcept>
+using namespace std;
+
+class Bill {
+protected:
+    string patient;
+
+public:
+    Bill(string p) : patient(p) {}
+    virtual ~Bill() = default;
+
+    virtual double total() const = 0;
+};
+
+class OutPatient : public Bill {
+public:
+    OutPatient(string p) : Bill(p) {}
+
+    double total() const override {
+        return 1700;
+    }
+};
+
+class DayCareBill : public Bill {
+    double packagePrice;
+
+public:
+    DayCareBill(string p, double price)
+        : Bill(p), packagePrice(price) {}
+
+    double total() const override {
+        if (packagePrice < 0)
+            throw invalid_argument("Invalid price");
+
+        return packagePrice;
+    }
+};
+
+class Payer {
+public:
+    virtual double amountCovered(const Bill& b) const = 0;
+    virtual ~Payer() = default;
+};
+
+class SelfPay : public Payer {
+public:
+    double amountCovered(const Bill& b) const override {
+        return b.total();
+    }
+};
+
+class CorporatePayer : public Payer {
+    double limit;
+
+public:
+    CorporatePayer(double l) : limit(l) {}
+
+    double amountCovered(const Bill& b) const override {
+        if (limit < 0)
+            throw invalid_argument("Invalid limit");
+
+        double amount = b.total();
+
+        return amount < limit ? amount : limit;
+    }
+};
+
+int main() {
+    try {
+        vector<unique_ptr<Bill>> bills;
+
+        bills.push_back(
+            make_unique<OutPatient>("Ravi"));
+
+        bills.push_back(
+            make_unique<DayCareBill>("Meena", 25000));
+
+        SelfPay self;
+        CorporatePayer corporate(20000);
+
+        for (auto& b : bills) {
+            cout << "Bill: " << b->total() << endl;
+            cout << "Self Pay: "
+                 << self.amountCovered(*b) << endl;
+            cout << "Corporate: "
+                 << corporate.amountCovered(*b) << endl;
+        }
+    }
+    catch (const exception& e) {
+        cout << "Error: " << e.what() << endl;
+    }
+    catch (...) {
+        cout << "Unknown Error" << endl;
+    }
+
+    return 0;
+}
