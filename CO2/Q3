@@ -1,0 +1,37 @@
+
+#include <iostream>
+using namespace std;
+
+struct Parcel {
+    double kg;
+    bool express;
+    bool insured;
+};
+
+double charge(double kg, bool express = false, bool insured = false) {
+    double c = kg * 10;
+    if (express) c += 20;
+    if (insured) c += 10;
+    return c;
+}
+
+double charge(int grams, bool express = false, bool insured = false) {
+    return charge(grams / 1000.0, express, insured);
+}
+
+double charge(const Parcel &p) {
+    return charge(p.kg, p.express, p.insured);
+}
+
+int main() {
+    Parcel p = {3.0, true, true};
+
+    cout << charge(2.5) << endl;
+    cout << charge(2) << endl;
+    cout << charge(2.0f) << endl;
+    cout << charge(3.1, true) << endl;
+    cout << charge(500, false, true) << endl;
+    cout << charge(p) << endl;
+
+    return 0;
+}
