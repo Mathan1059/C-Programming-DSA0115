@@ -1,0 +1,110 @@
+
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <stdexcept>
+using namespace std;
+using namespace chrono;
+
+class Bill {
+public:
+    virtual double total() const = 0;
+    virtual ~Bill() = default;
+};
+
+class OP : public Bill {
+    double c, t;
+public:
+    OP(double a, double b) : c(a), t(b) {}
+    double total() const override {
+        return c + t;
+    }
+};
+
+class IP : public Bill {
+    double d, r, s;
+public:
+    IP(double a, double b, double c) : d(a), r(b), s(c) {}
+    double total() const override {
+        return d * r + s;
+    }
+};
+
+struct SimpleBill {
+    int type;
+    double a, b, c;
+
+    double total() const {
+        if (type == 0)
+            return a + b;
+        return a * b + c;
+    }
+};
+
+void validate(double x, bool invalid) {
+    if (invalid)
+        throw invalid_argument("Invalid bill");
+}
+
+int main() {
+    vector<Bill*> v;
+    vector<SimpleBill> s;
+
+    for (int i = 0; i < 1000000; i++) {
+        v.push_back(new OP(500, 1200));
+        s.push_back({0, 500, 1200, 0});
+    }
+
+    double sum1 = 0, sum2 = 0;
+
+    auto start = steady_clock::now();
+
+    for (auto b : v)
+        sum1 += b->total();
+
+    auto end = steady_clock::now();
+
+    cout << "Virtual Total: " << sum1 << endl;
+    cout << "Virtual Time: "
+         << duration_cast<milliseconds>(end-start).count()
+         << " ms" << endl;
+
+    start = steady_clock::now();
+
+    for (auto b : s)
+        sum2 += b.total();
+
+    end = steady_clock::now();
+
+    cout << "Switch Total: " << sum2 << endl;
+    cout << "Switch Time: "
+         << duration_cast<milliseconds>(end-start).count()
+         << " ms" << endl;
+
+    for (auto b : v)
+        delete b;
+
+    for (int rate : {0, 1, 50}) {
+        int errors = 1000000 * rate / 100;
+        int count = 0;
+
+        start = steady_clock::now();
+
+        for (int i = 0; i < 1000000; i++) {
+            try {
+                validate(100, i < errors);
+            }
+            catch (const exception&) {
+                count++;
+            }
+        }
+
+        end = steady_clock::now();
+
+        cout << rate << "% Invalid: "
+             << duration_cast<milliseconds>(end-start).count()
+             << " ms, Errors: " << count << endl;
+    }
+
+    return 0;
+}
