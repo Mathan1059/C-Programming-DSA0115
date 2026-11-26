@@ -1,0 +1,24 @@
+
+#include <iostream>
+using namespace std;
+
+int& highest(int marks[], int n) {
+    int idx = 0;
+
+    for (int i = 1; i < n; i++) {
+        if (marks[i] > marks[idx])
+            idx = i;
+    }
+
+    return marks[idx];
+}
+
+int main() {
+    int m[] = {67, 89, 72, 91, 85};
+
+    highest(m, 5) += 2;
+
+    cout << m[3] << endl;
+
+    return 0;
+}
