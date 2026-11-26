@@ -1,0 +1,65 @@
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Address {
+    string city;
+    int pin;
+
+public:
+    Address(string c, int p) : city(c), pin(p) {}
+
+    string str() const {
+        return city + "-" + to_string(pin);
+    }
+};
+
+class Course {
+    string courseName;
+
+public:
+    Course(string c) : courseName(c) {}
+
+    string getName() const {
+        return courseName;
+    }
+};
+
+class Person {
+protected:
+    string name;
+    int age;
+    Address address;
+
+public:
+    Person(string n, int a, string c, int p)
+        : name(n), age(a), address(c, p) {}
+};
+
+class Student : public Person {
+    long long regNo;
+    Course course;
+
+public:
+    Student(string n, int a, long long r,
+            string city, int pin, string c)
+        : Person(n, a, city, pin),
+          regNo(r), course(c) {}
+
+    void print() const {
+        cout << regNo << " " << name
+             << " (" << age << ") "
+             << address.str() << " "
+             << course.getName() << endl;
+    }
+};
+
+int main() {
+    Student s("Kavya", 19, 192311001,
+              "Salem", 636001, "C++");
+
+    s.print();
+
+    return 0;
+}
